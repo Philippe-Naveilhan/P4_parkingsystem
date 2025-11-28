@@ -44,7 +44,10 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(Fare.CAR_RATE_PER_HOUR, ticket.getPrice());
+        double attempt = Fare.CAR_RATE_PER_HOUR;
+        assertEquals(attempt, ticket.getPrice());
+
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }
 
     @Test
@@ -58,7 +61,10 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals(Fare.BIKE_RATE_PER_HOUR, ticket.getPrice());
+        double attempt = Fare.BIKE_RATE_PER_HOUR;
+        assertEquals(attempt, ticket.getPrice());
+
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }
 
     @Test
@@ -99,8 +105,10 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
+        double attempt =  0.75 * Fare.BIKE_RATE_PER_HOUR;
+        assertEquals(attempt, ticket.getPrice() );
 
-        assertEquals((0.75 * Fare.BIKE_RATE_PER_HOUR), ticket.getPrice() );
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }
 
     @Test
@@ -114,7 +122,9 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals( ((float) 52 / 60 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
+        double attempt = (double) 52 / 60 * Fare.CAR_RATE_PER_HOUR;
+        assertEquals(attempt, ticket.getPrice());
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }
 
     @Test
@@ -128,34 +138,60 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals( (24 * Fare.CAR_RATE_PER_HOUR) , ticket.getPrice());
+
+        double attempt = (double) 24 * Fare.CAR_RATE_PER_HOUR;
+
+        assertEquals(attempt, ticket.getPrice());
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }
 
     @Test
     public void calculateFareCarWithLessThan30minutesParkingTime(){
         System.out.println("calculateFareCarWithLessThan30minutesParkingTime");
 
-        inTime.setTime(outTime.getTime() - (29 * 1000));
+        inTime.setTime(outTime.getTime() - (29 *60 * 1000));
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals( 0 , ticket.getPrice());
+        double attempt = 0;
+        assertEquals(attempt , ticket.getPrice());
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }
 
     @Test
     public void calculateFareBikeWithLessThan30minutesParkingTime(){
         System.out.println("calculateFareCarWithLessThan30minutesParkingTime");
-        inTime.setTime(outTime.getTime() - (29 * 1000));
+        inTime.setTime(outTime.getTime() - (29 * 60 * 1000));
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE,false);
 
         ticket.setInTime(inTime);
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertEquals( 0 , ticket.getPrice());
+        double attempt = 0;
+        assertEquals(attempt, ticket.getPrice());
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }
 
+    @Test
+    public void calculateFareRecurrentBikeWithReduceParkingTime(){
+        System.out.println("calculateFareRecurrentBikeWithReduceParkingTime");
+        inTime.setTime(outTime.getTime() - (3 * 60 * 60 * 1000));
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE,false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        ticket.setIsRecurrent(true);
+        System.out.println(ticket.getInTime());
+        System.out.println(ticket.getOutTime());
+        System.out.println(ticket.getIsRecurrent());
+        fareCalculatorService.calculateFare(ticket);
+        double attempt = (double) 3 * Fare.BIKE_RATE_PER_HOUR * (100 - Fare.REDUCE_FOR_RECURRENT_IN_PERCENT) / 100;
+        assertEquals( attempt , ticket.getPrice());
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
+    }
 }
