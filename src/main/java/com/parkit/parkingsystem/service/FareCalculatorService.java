@@ -16,18 +16,19 @@ public class FareCalculatorService {
         Date dateIn = ticket.getInTime();
         Date dateOut = ticket.getOutTime();
         int durationInMinutes = (int) (dateOut.getTime() - dateIn.getTime()) / (1000 * 60); //1000ms * 60 s = in minute
-        float taxedDurationInHour = durationInMinutes < Fare.MAX_TIME_FOR_FREE_IN_MINUTES ? 0 : (float) durationInMinutes / 60;
-
+        double taxedDurationInHour = durationInMinutes < Fare.MAX_TIME_FOR_FREE_IN_MINUTES ? 0 : (double) durationInMinutes / 60;
+        double fare;
         switch (ticket.getParkingSpot().getParkingType()){
             case CAR: {
-                ticket.setPrice(taxedDurationInHour * Fare.CAR_RATE_PER_HOUR);
+                fare = taxedDurationInHour * Fare.CAR_RATE_PER_HOUR;
                 break;
             }
             case BIKE: {
-                ticket.setPrice(taxedDurationInHour * Fare.BIKE_RATE_PER_HOUR);
+                fare = taxedDurationInHour * Fare.BIKE_RATE_PER_HOUR;
                 break;
             }
             default: throw new IllegalArgumentException("Unkown Parking Type");
         }
+        ticket.setPrice(ticket.getIsRecurrent() ? (fare * (100 - Fare.REDUCE_FOR_RECURRENT_IN_PERCENT) / 100) : fare);
     }
 }
