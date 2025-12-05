@@ -12,7 +12,6 @@ public class FareCalculatorService {
             throw new IllegalArgumentException("Out time provided is incorrect:"+ticket.getOutTime().toString());
         }
 
-        //TODO: Some tests are failing here. Need to check if this logic is correct
         Date dateIn = ticket.getInTime();
         Date dateOut = ticket.getOutTime();
         int durationInMinutes = (int) (dateOut.getTime() - dateIn.getTime()) / (1000 * 60); //1000ms * 60 s = in minute

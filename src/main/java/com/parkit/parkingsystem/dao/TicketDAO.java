@@ -2,6 +2,7 @@ package com.parkit.parkingsystem.dao;
 
 import com.parkit.parkingsystem.config.DataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
@@ -98,6 +99,9 @@ public class TicketDAO {
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 int result = rs.getInt(1);
+                if(result > 0){
+                    System.out.println(Fare.MESSAGE_FOR_RECURRENTS);
+                }
                 return result > 0;
             }
         }catch (Exception ex){
