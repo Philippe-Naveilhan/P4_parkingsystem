@@ -25,7 +25,7 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, SET_RECURRENT
+            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT
             //ps.setInt(1,ticket.getId());
             ps.setInt(1,ticket.getParkingSpot().getId());
             ps.setString(2, ticket.getVehicleRegNumber());
@@ -34,9 +34,9 @@ public class TicketDAO {
             ps.setTimestamp(5, (ticket.getOutTime() == null)?null: (new Timestamp(ticket.getOutTime().getTime())) );
             ps.setBoolean(6, ticket.getIsRecurrent());
             return ps.execute();
-        }catch (Exception ex){
+        } catch (Exception ex){
             logger.error("Error fetching next available slot",ex);
-        }finally {
+        } finally{
             dataBaseConfig.closeConnection(con);
             return false;
         }
@@ -48,18 +48,19 @@ public class TicketDAO {
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.GET_TICKET);
-            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME)
+            //ID, PARKING_NUMBER, VEHICLE_REG_NUMBER, PRICE, IN_TIME, OUT_TIME, IS_RECURRENT
             ps.setString(1,vehicleRegNumber);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 ticket = new Ticket();
-                ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(6)),false);
+                ParkingSpot parkingSpot = new ParkingSpot(rs.getInt(1), ParkingType.valueOf(rs.getString(7)),false);
                 ticket.setParkingSpot(parkingSpot);
                 ticket.setId(rs.getInt(2));
                 ticket.setVehicleRegNumber(vehicleRegNumber);
                 ticket.setPrice(rs.getDouble(3));
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
+                ticket.setIsRecurrent(rs.getBoolean(6));
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -97,12 +98,13 @@ public class TicketDAO {
             ps.setString(1, vehicleRegNumber);
             ps.execute();
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
+            boolean next = rs.next();
+            if(next){
                 int result = rs.getInt(1);
                 if(result > 0){
                     System.out.println(Fare.MESSAGE_FOR_RECURRENTS);
+                    return true;
                 }
-                return result > 0;
             }
         }catch (Exception ex){
             logger.error("Error saving ticket info",ex);
