@@ -177,8 +177,8 @@ public class FareCalculatorServiceTest {
     }
 
     @Test
-    public void calculateFareRecurrentBikeWithReduceParkingTime(){
-        System.out.println("calculateFareRecurrentBikeWithReduceParkingTime");
+    public void calculateFareBikeWithDiscount(){
+        System.out.println("calculateFareBikeWithDiscount");
         inTime.setTime(outTime.getTime() - (3 * 60 * 60 * 1000));
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.BIKE,false);
 
@@ -186,11 +186,24 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         ticket.setIsRecurrent(true);
-        System.out.println(ticket.getInTime());
-        System.out.println(ticket.getOutTime());
-        System.out.println(ticket.getIsRecurrent());
         fareCalculatorService.calculateFare(ticket);
         double attempt = (double) 3 * Fare.BIKE_RATE_PER_HOUR * (100 - Fare.REDUCE_FOR_RECURRENT_IN_PERCENT) / 100;
+        assertEquals( attempt , ticket.getPrice());
+        System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
+    }
+
+    @Test
+    public void calculateFareCarWithDiscount(){
+        System.out.println("calculateFareCarWithDiscount");
+        inTime.setTime(outTime.getTime() - (3 * 60 * 60 * 1000));
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        ticket.setIsRecurrent(true);
+        fareCalculatorService.calculateFare(ticket);
+        double attempt = (double) 3 * Fare.CAR_RATE_PER_HOUR * (100 - Fare.REDUCE_FOR_RECURRENT_IN_PERCENT) / 100;
         assertEquals( attempt , ticket.getPrice());
         System.out.println("Attempt : " + attempt + ", result : " + ticket.getPrice());
     }

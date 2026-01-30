@@ -1,5 +1,7 @@
 package com.parkit.parkingsystem.service;
 
+import com.parkit.parkingsystem.constants.DBConstants;
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -32,21 +34,25 @@ public class ParkingService {
             ParkingSpot parkingSpot = getNextParkingNumberIfAvailable();
             if(parkingSpot !=null && parkingSpot.getId() > 0){
                 String vehicleRegNumber = getVehicleRegNumber();
-                parkingSpot.setAvailable(false);
-                parkingSpotDAO.updateParking(parkingSpot); //allot this parking space and mark it's availability as false
+                // verify if vehicle isn't already in the park
+                if(ticketDAO.isVehicleIsOut(vehicleRegNumber)){
+                    parkingSpot.setAvailable(false);
+                    parkingSpotDAO.updateParking(parkingSpot); //allot this parking space and mark it's availability as false
 
-                Date inTime = new Date();
-                Ticket ticket = new Ticket();
-                ticket.setParkingSpot(parkingSpot);
-                ticket.setVehicleRegNumber(vehicleRegNumber);
-                ticket.setPrice(0);
-                ticket.setInTime(inTime);
-                ticket.setOutTime(null);
-                ticket.setIsRecurrent(ticketDAO.isRecurrentVisit(vehicleRegNumber));
-                ticketDAO.saveTicket(ticket);
-                System.out.println("Generated Ticket and saved in DB");
-                System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
-                System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime+"\n");
+                    Date inTime = new Date();
+                    Ticket ticket = new Ticket();
+                    ticket.setParkingSpot(parkingSpot);
+                    ticket.setVehicleRegNumber(vehicleRegNumber);
+                    ticket.setPrice(0);
+                    ticket.setInTime(inTime);
+                    ticket.setOutTime(null);
+                    ticket.setIsRecurrent(ticketDAO.isRecurrentVisit(vehicleRegNumber));
+                    ticketDAO.saveTicket(ticket);
+                    System.out.println("Generated Ticket and saved in DB");
+                    System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
+                    System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime+"\n");
+                }
+
             }
         }catch(Exception e){
             logger.error("Unable to process incoming vehicle",e);

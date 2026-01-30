@@ -113,4 +113,28 @@ public class TicketDAO {
         }
         return false;
     }
+
+    public boolean isVehicleIsOut(String vehicleRegNumber){
+        Connection con = null;
+        try {
+            con = dataBaseConfig.getConnection();
+            PreparedStatement ps = con.prepareStatement(DBConstants.IS_VEHICLE_IS_OUT);
+            ps.setString(1, vehicleRegNumber);
+            ps.execute();
+            ResultSet rs = ps.executeQuery();
+            boolean next = rs.next();
+            if(next){
+                int result = rs.getInt(1);
+                if(result>0){
+                    System.out.println(Fare.MESSAGE_ALREADY_IN);
+                    return false;
+                }
+            }
+        }catch (Exception ex){
+            logger.error("Error verify vehicle presence",ex);
+        }finally {
+            dataBaseConfig.closeConnection(con);
+        }
+        return true;
+    }
 }
